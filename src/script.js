@@ -30,7 +30,19 @@ const floor = new THREE.Mesh(
 floor.receiveShadow = true;
 floor.rotation.x = -Math.PI * 0.5;
 scene.add(floor);
-
+/**
+ * Points
+ */
+const points = [
+  {
+    position: new THREE.Vector3(1.55, 0.3, 0.76),
+    element: document.querySelector(".point-0")
+  },
+  {
+    position: new THREE.Vector3(1.55, 0.6, 0.76),
+    element: document.querySelector(".point-1")
+  }
+];
 /**
  * Lights
  */
@@ -127,6 +139,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 const clock = new THREE.Clock();
 let previousTime = 0;
+/**
+ * Raycaster
+ */
+const raycaster = new THREE.Raycaster();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
@@ -135,7 +151,35 @@ const tick = () => {
 
   // Update controls
   controls.update();
-
+  // Go through each point
+  for (const point of points) {
+    // clone the position of the point
+    const screenPosition = point.position.clone();
+    // get the 2D screen position of the 3D scene position of the point
+    screenPosition.project(camera);
+    // update raycaster to go from the camera to the point
+    raycaster.setFromCamera(screenPosition, camera);
+    // ensure point is tied correctly to its 3D position
+    const translateX = screenPosition.x * sizes.width * 0.5;
+    const translateY = -screenPosition.y * sizes.height * 0.5;
+    point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+    // test raycaster against all the objects in the scene, "true" parameter enables recursive testing
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    // check intersects array, if array is empty then the point should be visible
+    if (intersects.length === 0) {
+      point.element.classList.add("visible");
+    } else {
+      // intersection could be behind the point, calculate the distance to the point, then calculate the intersections distance and compare
+      const intersectionDistance = intersects[0].distance;
+      const pointDistance = point.position.distanceTo(camera.position);
+      // if the intersectionDistance is less than the point distance i.e. the point is further away from the camera, it should not be visible
+      if (intersectionDistance < pointDistance) {
+        point.element.classList.remove("visible");
+      } else {
+        point.element.classList.add("visible");
+      }
+    }
+  }
   // Render
   renderer.render(scene, camera);
 
