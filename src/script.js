@@ -1,8 +1,8 @@
-import "./style.css";
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "lil-gui";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import './style.css';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as dat from 'lil-gui';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 /**
  * Base
@@ -11,7 +11,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 const gui = new dat.GUI();
 
 // Canvas
-const canvas = document.querySelector("canvas.webgl");
+const canvas = document.querySelector('canvas.webgl');
 
 // Scene
 const scene = new THREE.Scene();
@@ -22,7 +22,7 @@ const scene = new THREE.Scene();
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 10),
   new THREE.MeshStandardMaterial({
-    color: "#444444",
+    color: '#444444',
     metalness: 0,
     roughness: 0.5
   })
@@ -36,11 +36,11 @@ scene.add(floor);
 const points = [
   {
     position: new THREE.Vector3(1.55, 0.3, 0.76),
-    element: document.querySelector(".point-0")
+    element: document.querySelector('.point-0')
   },
   {
     position: new THREE.Vector3(1.55, 0.6, 0.76),
-    element: document.querySelector(".point-1")
+    element: document.querySelector('.point-1')
   }
 ];
 /**
@@ -65,7 +65,7 @@ scene.add(directionalLight);
  */
 const gltfLoader = new GLTFLoader();
 gltfLoader.load(
-  "/models/Boulder/boulder.glb",
+  '/models/Boulder/boulder.glb',
   (glb) => {
     const boulderScene = glb.scene;
     boulderScene.scale.set(0.01, 0.01, 0.01);
@@ -91,7 +91,7 @@ const sizes = {
   height: window.innerHeight
 };
 
-window.addEventListener("resize", () => {
+window.addEventListener('resize', () => {
   // Update sizes
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
@@ -117,6 +117,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(2, 2, 2);
 scene.add(camera);
+console.log(camera);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
@@ -167,16 +168,16 @@ const tick = () => {
     const intersects = raycaster.intersectObjects(scene.children, true);
     // check intersects array, if array is empty then the point should be visible
     if (intersects.length === 0) {
-      point.element.classList.add("visible");
+      point.element.classList.add('visible');
     } else {
       // intersection could be behind the point, calculate the distance to the point, then calculate the intersections distance and compare
       const intersectionDistance = intersects[0].distance;
       const pointDistance = point.position.distanceTo(camera.position);
       // if the intersectionDistance is less than the point distance i.e. the point is further away from the camera, it should not be visible
       if (intersectionDistance < pointDistance) {
-        point.element.classList.remove("visible");
+        point.element.classList.remove('visible');
       } else {
-        point.element.classList.add("visible");
+        point.element.classList.add('visible');
       }
     }
   }
